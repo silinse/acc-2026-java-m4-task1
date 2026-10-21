@@ -20,6 +20,6 @@ public class ShelterCsvApplication {
 
         ImportResult importResult = importService.importAnimals(inputPath);
         ShelterReportData reportData = analyticsService.buildReportData(importResult);
-        reportExportService.writeReport(outputPath, reportData);
+        reportExportService.writeReport(outputPath, reportData, importResult);
     }
 }
