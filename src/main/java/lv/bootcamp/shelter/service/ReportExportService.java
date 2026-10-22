@@ -29,6 +29,10 @@ public class ReportExportService {
             bw.newLine();
             bw.write("Total skipped:  " + importResult.skippedRows());
             bw.newLine();
+            bw.write("Invalid rows:   " + importResult.invalidRows().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(", ")));
+            bw.newLine();
             bw.newLine();
             bw.write("--- Unique species ---");
             bw.newLine();
@@ -52,7 +56,7 @@ public class ReportExportService {
                 if (entry.getValue().isPresent()) {
                     Animal animal = entry.getValue().get();
                     bw.write(String.format("%-10s %s",
-                            entry.getKey() + ": ",  animal.getName() + " (age " + animal.getAge().get() + ")"));
+                            entry.getKey() + ": ", animal.getName() + " (age " + animal.getAge().get() + ")"));
                     bw.newLine();
                 }
             }
