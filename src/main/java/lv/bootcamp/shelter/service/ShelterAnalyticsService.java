@@ -20,7 +20,7 @@ public class ShelterAnalyticsService {
                 .collect(Collectors.groupingBy(Animal::getSpecies));
 
         List<String> animalsNeedingVetInput = allAnimals.stream()
-                .filter(a -> !a.isVaccinated())
+                .filter(a -> a.getAge().isEmpty())
                 .map(a -> a.getName() + "(" + a.getSpecies() + ")")
                 .toList();
 

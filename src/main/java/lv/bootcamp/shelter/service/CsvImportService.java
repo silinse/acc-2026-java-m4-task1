@@ -63,6 +63,12 @@ public class CsvImportService {
                 } else {
                     try {
                         age = Optional.of(Integer.parseInt(parts[2].trim()));
+
+                        if ( age.get() <  1) {
+                            log.warn("Skipping row with non-positive age value: {}", line);
+                            skippedCount++;
+                            continue;
+                        }
                     } catch (NumberFormatException e) {
                         log.warn("Skipping row with non-numeric age value: {}", line);
                         skippedCount++;

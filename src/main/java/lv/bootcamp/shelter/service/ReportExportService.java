@@ -20,45 +20,45 @@ public class ReportExportService {
 
     public void writeReport(Path outputPath, ShelterReportData reportData, ImportResult importResult) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputPath.toString(), StandardCharsets.UTF_8))) {
-            bw.write("=== Report ==");
+            bw.write("=== Shelter Intake Report ===");
             bw.newLine();
-            bw.write("Date: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+            bw.write("Date generated: " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
             bw.newLine();
-            bw.write("Imported animals: " + importResult.allAnimals().size());
             bw.newLine();
-            bw.write("Skipped rows: " + importResult.skippedRows());
+            bw.write("Total imported: " + importResult.allAnimals().size());
             bw.newLine();
-            bw.write("Unique species: " + String.join(", ", reportData.uniqueSpecies()));
+            bw.write("Total skipped:  " + importResult.skippedRows());
+            bw.newLine();
+            bw.newLine();
+            bw.write("--- Unique species ---");
+            bw.newLine();
+            bw.write(String.join(", ", reportData.uniqueSpecies()));
             bw.newLine();
 
             bw.newLine();
-            bw.write("Per-species breakdown: ");
+            bw.write("--- Per-species breakdown ---");
             bw.newLine();
             for (Map.Entry<String, List<Animal>> entry : new TreeMap<>(reportData.animalsBySpecies()).entrySet()) {
-                String names = entry.getValue().stream()
-                        .map(Animal::getName)
-                        .collect(Collectors.joining(", "));
-                bw.write(entry.getKey() + ": " + names);
-                bw.newLine();
-                bw.write("  Total: " + entry.getValue().size());
-                bw.newLine();
-                bw.write("  Vaccinated: " + reportData.vaccinatedCounts().get(entry.getKey()));
+                bw.write(String.format("%-10s  %d total, %d vaccinated",
+                        entry.getKey() + ": ", entry.getValue().size(),
+                        reportData.vaccinatedCounts().getOrDefault(entry.getKey(), 0L)));
                 bw.newLine();
             }
 
             bw.newLine();
-            bw.write("Oldest animal per-species");
+            bw.write("--- Oldest animal per-species ---");
             bw.newLine();
             for (Map.Entry<String, Optional<Animal>> entry : new TreeMap<>(reportData.oldestAnimalPerSpecies()).entrySet()) {
                 if (entry.getValue().isPresent()) {
                     Animal animal = entry.getValue().get();
-                    bw.write("  " + entry.getKey() + ": " + animal.getName() + " (" + animal.getAge().get() + " years)");
+                    bw.write(String.format("%-10s %s",
+                            entry.getKey() + ": ",  animal.getName() + " (age " + animal.getAge().get() + ")"));
                     bw.newLine();
                 }
             }
 
             bw.newLine();
-            bw.write("Animals needing vet input:");
+            bw.write("--- Needs Vet input to determine age ---");
             bw.newLine();
             bw.write(reportData.animalsNeedingVetInput().stream()
                     .sorted(Comparator.comparing(
